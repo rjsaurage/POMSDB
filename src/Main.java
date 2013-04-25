@@ -29,27 +29,27 @@ public class Main {
 			psInsert.setString(2, "" + currentScenario.getCashAssets());
 			psInsert.setString(3, "" + currentScenario.getSalesPrice());
 			psInsert.setString(4, "" + currentScenario.getPassword());
-			psInsert.setString(5, "" + currentScenario.getDoubleShift());
-			psInsert.setString(6, "" + currentScenario.getNormalShift());
-			psInsert.setString(7, "" + currentScenario.getNewEmpAdv());
-			psInsert.setString(8, "" + currentScenario.getNewHireCost());
-			psInsert.setString(9, "" + currentScenario.getSeveranceCost());
-			psInsert.setString(10, "" + currentScenario.getDemand());
-			psInsert.setString(11, "" + currentScenario.getBatchSizeProdSmall());
-			psInsert.setString(12, "" + currentScenario.getBatchSizeProdLarge());
-			psInsert.setString(13, "" + currentScenario.getInventory());
-			psInsert.setString(14, "" + currentScenario.getStorageCost());
-			psInsert.setString(15, "" + currentScenario.getShrinkage());
-			psInsert.setString(16, "" + currentScenario.getTotalLoss());
-			psInsert.setString(17, "" + currentScenario.getLoss());
-			psInsert.setString(18, "" + currentScenario.getGoodsProduced());
-			psInsert.setString(19, "" + currentScenario.getDefectiveGoodsProduced());
-			psInsert.setString(20, "" + currentScenario.getDefectiveProdRate());
+			psInsert.setString(5, "" + currentScenario.getProduction());
+			psInsert.setString(6, "" + currentScenario.getDoubleShiftCost());
+			psInsert.setString(7, "" + currentScenario.getDoubleShiftProdAdv());
+			psInsert.setString(8, "" + currentScenario.getNormalShiftCost());
+			psInsert.setString(9, "" + currentScenario.getNewEmpAdv());
+			psInsert.setString(10, "" + currentScenario.getNewHireCost());
+			psInsert.setString(11, "" + currentScenario.getSeveranceCost());
+			psInsert.setString(12, "" + currentScenario.getDemand());
+			psInsert.setString(13, "" + currentScenario.getBatchSizeProdSmall());
+			psInsert.setString(14, "" + currentScenario.getBatchSizeProdLarge());
+			psInsert.setString(15, "" + currentScenario.getInventory());
+			psInsert.setString(16, "" + currentScenario.getStorageCost());
+			psInsert.setString(17, "" + currentScenario.getShrinkage());
+			psInsert.setString(18, "" + currentScenario.getDefectiveProdRate());
+			psInsert.setString(19, "" + currentScenario.getWaterBottles());
+			psInsert.setString(20, "" + currentScenario.getLabels());
 			psInsert.setString(21, "" + currentScenario.getWaterBottles());
-			psInsert.setString(22, "" + currentScenario.getLabels());
-			psInsert.setString(23, "" + currentScenario.getPackingCases());
-			psInsert.setString(24, "" + currentScenario.getFinProdInspection());
-			psInsert.setString(25, "" + currentScenario.getFinBottleInspection());
+			psInsert.setString(22, "" + currentScenario.getPackingCases());
+			psInsert.setString(23, "" + currentScenario.getFinalInspection());
+			psInsert.setString(24, "" + currentScenario.getFinBottleInspection());
+			psInsert.setString(25, "" + currentScenario.getEmployees());
 			psInsert.setString(26, "" + currentScenario.getDemandPenalty());
 			psInsert.executeUpdate();
 		}
@@ -237,6 +237,8 @@ public class Main {
 			psInsert.setString(4, "" + januaryArray[x]);
 			psInsert.executeUpdate();
 			
+			currentCycle++;
+			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
 			psInsert.setString(1, "" + currentCycle);
@@ -244,6 +246,8 @@ public class Main {
 			psInsert.setString(3, "" + x);
 			psInsert.setString(4, "" + februaryArray[x]);
 			psInsert.executeUpdate();
+			
+			currentCycle++;
 			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
@@ -263,6 +267,8 @@ public class Main {
 			psInsert.setString(4, "" + aprilArray[x]);
 			psInsert.executeUpdate();
 			
+			currentCycle++;
+			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
 			psInsert.setString(1, "" + currentCycle);
@@ -271,6 +277,8 @@ public class Main {
 			psInsert.setString(4, "" + juneArray[x]);
 			psInsert.executeUpdate();
 
+			currentCycle++;
+			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
 			psInsert.setString(1, "" + currentCycle);
@@ -289,6 +297,8 @@ public class Main {
 			psInsert.setString(4, "" + julyArray[x]);
 			psInsert.executeUpdate();
 			
+			currentCycle++;
+			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
 			psInsert.setString(1, "" + currentCycle);
@@ -296,6 +306,8 @@ public class Main {
 			psInsert.setString(3, "" + x);
 			psInsert.setString(4, "" + augustArray[x]);
 			psInsert.executeUpdate();
+			
+			currentCycle++;
 			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
@@ -315,6 +327,8 @@ public class Main {
 			psInsert.setString(4, "" + octoberArray[x]);
 			psInsert.executeUpdate();
 			
+			currentCycle++;
+			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
 			psInsert.setString(1, "" + currentCycle);
@@ -322,6 +336,8 @@ public class Main {
 			psInsert.setString(3, "" + x);
 			psInsert.setString(4, "" + novemberArray[x]);
 			psInsert.executeUpdate();
+			
+			currentCycle++;
 			
 			psInsert = conn
 				    .prepareStatement("insert into Demand values (?,?,?,?)");
@@ -379,25 +395,26 @@ public class Main {
 		}
 	}
 	
-	public static LinkedList getDemandList(int currentCycle){
+	public static int getNextDemand(int currentCycle){
 	//currentCycle comes from scenario file
 		//Should return linked list
-		LinkedList demandList = new LinkedList();
+		int nextCycle = currentCycle + 1;
+		int nextMonthDemand = 0;
 		ResultSet rs;
 		try{
-			String demandString = "Select Demand from Demand where cycle = '" + currentCycle + "'";
+			String demandString = "Select Demand from Demand where cycle = '" + nextCycle + "'";
 		Statement stmt2 = conn.createStatement();
 		rs = stmt2.executeQuery(demandString);
 		while (rs.next()) {
 		  System.out.println(rs.getInt(1));
-		  demandList.add(rs.getInt(1));
+		  nextMonthDemand = rs.getInt(1);
 		}
 		}
 		catch(Exception e){
 			System.out.println(e);
-			return demandList;
+			return nextMonthDemand;
 		}
-		return demandList;
+		return nextMonthDemand;
 		
 	}
 	
@@ -409,6 +426,7 @@ public class Main {
 			Statement stmt2 = conn.createStatement();
 			rs = stmt2.executeQuery(cycleString);
 			rs.next();
+			System.out.println("Last Cycle Num is " + rs.getInt(1));
 			return rs.getInt(1);
 			}
 			catch(Exception e){
@@ -484,7 +502,7 @@ public class Main {
 		clearDemandTable();
 		insertDemand(demand);
 		printDemand();
-		getDemandList(getLatestCycleNum());	
+		getNextDemand(getLatestCycleNum());	
 		generateDemandTemplate("DemandTemplate.csv"); 
 		loadGame();
 		

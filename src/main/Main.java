@@ -1,3 +1,5 @@
+package src;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,10 +31,10 @@ public class Main {
 			psInsert.setString(2, "" + currentScenario.getCashAssets());
 			psInsert.setString(3, "" + currentScenario.getSalesPrice());
 			psInsert.setString(4, "" + currentScenario.getPassword());
-			psInsert.setString(5, "" + currentScenario.getProduction());
-			psInsert.setString(6, "" + currentScenario.getDoubleShiftCost());
-			psInsert.setString(7, "" + currentScenario.getDoubleShiftProdAdv());
-			psInsert.setString(8, "" + currentScenario.getNormalShiftCost());
+//			psInsert.setString(5, "" + currentScenario.getProduction());
+//			psInsert.setString(6, "" + currentScenario.getDoubleShiftCost());
+//			psInsert.setString(7, "" + currentScenario.getDoubleShiftProdAdv());
+//			psInsert.setString(8, "" + currentScenario.getNormalShiftCost());
 			psInsert.setString(9, "" + currentScenario.getNewEmpAdv());
 			psInsert.setString(10, "" + currentScenario.getNewHireCost());
 			psInsert.setString(11, "" + currentScenario.getSeveranceCost());
@@ -47,9 +49,9 @@ public class Main {
 			psInsert.setString(20, "" + currentScenario.getLabels());
 			psInsert.setString(21, "" + currentScenario.getWaterBottles());
 			psInsert.setString(22, "" + currentScenario.getPackingCases());
-			psInsert.setString(23, "" + currentScenario.getFinalInspection());
+//			psInsert.setString(23, "" + currentScenario.getFinalInspection());
 			psInsert.setString(24, "" + currentScenario.getFinBottleInspection());
-			psInsert.setString(25, "" + currentScenario.getEmployees());
+//			psInsert.setString(25, "" + currentScenario.getEmployees());
 			psInsert.setString(26, "" + currentScenario.getDemandPenalty());
 			psInsert.executeUpdate();
 		}
@@ -381,6 +383,29 @@ public class Main {
 			System.out.println(e);
 		}
 	}
+	
+	public static void saveDemand(){
+		ResultSet rs;
+		// Need a file buffer/stream
+		try{
+		Statement stmt2 = conn.createStatement();
+		rs = stmt2.executeQuery("select * from Demand");
+		
+		while (rs.next()) {
+			for(int x = 1;x<=4;x++){
+				String out = "";
+				out = (rs.getString(x) + " ");
+			}
+		}
+		
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		
+		
+	}
+	
 	
 	//Clears everything from the demand table
 	public static void clearDemandTable(){

@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -17,7 +18,7 @@ import java.security.interfaces.*;
 
 
 public class Main {
-	static String gameName = "spaghetti";
+	static String saveName = "spaghetti";
 	public static Connection conn;
 
 	//insertScenerio Method (validation Checks)
@@ -416,7 +417,8 @@ public class Main {
 	public static void saveGame(){// Obfuscate the file by subtracting 1 from each byte. Reverse by adding when we read in
 		ResultSet rs;
 		// Need a file buffer/stream
-		String out = "I like turtles:";
+		String count = "DemandCount(";
+		String out = "";
 		try{
 			int demandIter = 0;
 			Statement stmt2 = conn.createStatement();
@@ -433,9 +435,55 @@ public class Main {
 					}
 				}
 			}
-			out += "DemandEnd("+ demandIter +")";
+			out += "DemandEnd";
+			count += demandIter+")"+out;//Should read "DemandCount(50*)100101010....DemandEnd", the 50 can be any number really
+			
 			//out now has the demand as a binary string
 			int scenarioIter = 0;
+			Statement stmt1 = conn.createStatement();
+			count += "ScenarioCount(";
+			out = "";
+			rs = stmt1.executeQuery("select * from Scenario");
+			while (rs.next()) {
+				scenarioIter++;
+					for(int x = 1;x<=26;x++){
+					//				Byte bout = 0;
+					InputStream in = rs.getBinaryStream(x);
+					int input = in.read()-1;// .read returns an int 0-255
+					while(input != -2){//because we're always subtracting 1, if it returned -1 for no more, it would be -2
+						out += Integer.toBinaryString(input);
+						input = in.read()-1;
+					}
+				}
+			}
+			// out now is the demand as a bytestring, with the scenario as a byte string concatenated on it
+			out += "ScenariosEnd";
+			count +=scenarioIter+")"+ out;
+			//Count should read "DemandCount(5)100101010....DemandEndScenarioCout(24)......ScenarioEnd"
+			//The data is obfuscated more or less bitwise
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		try {
+			FileWriter fOut = new FileWriter(saveName+".gme");//We'll have to change game name if they change it in their prompt.
+			//We COULD make it so that we dictate the save names, but people tend to not like that.
+			fOut.append(count);
+			fOut.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	
+	public static void saveScenario(){// Obfuscate the file by subtracting 1 from each byte. Reverse by adding when we read in
+		ResultSet rs;
+		// Need a file buffer/stream
+		String temp = "ScenariosCount(";
+		String out = "I like turtles:";
+		try{
+			int scenarioIter = 0;//keep  track of how many scenarios we're going to read
 			Statement stmt1 = conn.createStatement();
 			rs = stmt1.executeQuery("select * from Scenario");
 			while (rs.next()) {
@@ -451,24 +499,22 @@ public class Main {
 				}
 			}
 			// out now is the demand as a bytestring, with the scenario as a byte string concatenated on it
-			out += "ScenariosEnd("+ scenarioIter +")";
+			out += "ScenarioEnd";
+			temp += scenarioIter +")" + out;
 		}
 		catch(Exception e){
 			System.out.println(e);
 		}
 		try {
-			FileWriter fOut = new FileWriter(gameName+".gme");//We'll have to change game name if they change it in their prompt.
+			FileWriter fOut = new FileWriter(saveName+".scn");//We'll have to change game name if they change it in their prompt.
 			//We COULD make it so that we dictate the save names, but people tend to not like that.
-			fOut.append(out);
+			fOut.append(temp);
 			fOut.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-	
-	
 	
 	
 

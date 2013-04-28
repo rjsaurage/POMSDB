@@ -1,6 +1,7 @@
 
 
 import java.io.File;
+import java.util.zip.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,9 +10,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.interfaces.*;
 
 
@@ -417,8 +423,7 @@ public class Main {
 	public static void saveGame(){// Obfuscate the file by subtracting 1 from each byte. Reverse by adding when we read in
 		ResultSet rs;
 		// Need a file buffer/stream
-		String count = "DemandCount(";
-		String out = "";
+		String out = "Demand(";
 		try{
 			int demandIter = 0;
 			Statement stmt2 = conn.createStatement();
@@ -426,41 +431,36 @@ public class Main {
 			while (rs.next()) {//need to keep track of how many rs.next() we get
 				demandIter ++;
 				for(int x = 1;x<=4;x++){
-					//				Byte bout = 0;
-					InputStream in = rs.getBinaryStream(x);
-					int input = in.read()-1;// .read returns an int 0-255
-					while(input != -2){//because we're always subtracting 1, if it returned -1 for no more, it would be -2
-						out += Integer.toBinaryString(input);
-						input = in.read()-1;
-					}
+					String in = rs.getString(x);
+					out+= in;
+					if(x<4)
+						out += ",";
 				}
+				out+= "endRow";
+		
 			}
-			out += "DemandEnd";
-			count += demandIter+")"+out;//Should read "DemandCount(50*)100101010....DemandEnd", the 50 can be any number really
+			out += ")";// should be "Demand( #,#,#,#endRow#,#,#,#endRow....endRow)
 			
 			//out now has the demand as a binary string
-			int scenarioIter = 0;
 			Statement stmt1 = conn.createStatement();
-			count += "ScenarioCount(";
-			out = "";
+			out += "ScenarioCount(";
 			rs = stmt1.executeQuery("select * from Scenario");
 			while (rs.next()) {
-				scenarioIter++;
-					for(int x = 1;x<=26;x++){
-					//				Byte bout = 0;
-					InputStream in = rs.getBinaryStream(x);
-					int input = in.read()-1;// .read returns an int 0-255
-					while(input != -2){//because we're always subtracting 1, if it returned -1 for no more, it would be -2
-						out += Integer.toBinaryString(input);
-						input = in.read()-1;
-					}
+				for(int x = 1;x<=26;x++){
+					String in = rs.getString(x);
+					out += in;
+					if(x<26)
+						out+= ",";
 				}
+				out+= "endRow";
+
 			}
-			// out now is the demand as a bytestring, with the scenario as a byte string concatenated on it
-			out += "ScenariosEnd";
-			count +=scenarioIter+")"+ out;
-			//Count should read "DemandCount(5)100101010....DemandEndScenarioCout(24)......ScenarioEnd"
-			//The data is obfuscated more or less bitwise
+			// out is now "Demand(.....)Scenario(...)
+			out += ")";
+			GZIPOutputStream gzipIn = new GZIPOutputStream(new FileOutputStream(saveName+".gme"));
+			gzipIn.write(out.getBytes());
+			gzipIn.close();
+			//Note, our files may be so small that compression increases the size, which is fine, the compression is mostly to obfuscate the string
 		}
 		catch(Exception e){
 			System.out.println(e);
@@ -468,7 +468,7 @@ public class Main {
 		try {
 			FileWriter fOut = new FileWriter(saveName+".gme");//We'll have to change game name if they change it in their prompt.
 			//We COULD make it so that we dictate the save names, but people tend to not like that.
-			fOut.append(count);
+			fOut.append(out);
 			fOut.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -483,24 +483,27 @@ public class Main {
 		String temp = "ScenariosCount(";
 		String out = "I like turtles:";
 		try{
-			int scenarioIter = 0;//keep  track of how many scenarios we're going to read
+			int scenarioIter = 0;//keep  track of how many bytes of scenario we're going to read
 			Statement stmt1 = conn.createStatement();
 			rs = stmt1.executeQuery("select * from Scenario");
 			while (rs.next()) {
-				scenarioIter++;
-					for(int x = 1;x<=26;x++){
-					//				Byte bout = 0;
-					InputStream in = rs.getBinaryStream(x);
-					int input = in.read()-1;// .read returns an int 0-255
-					while(input != -2){//because we're always subtracting 1, if it returned -1 for no more, it would be -2
-						out += Integer.toBinaryString(input);
-						input = in.read()-1;
-					}
+				for(int x = 1;x<=26;x++){
+					String in = rs.getString(x);
+					out += in;
+					if(x<26)
+						out+= ",";
 				}
+				out+= "endRow";
+
 			}
-			// out now is the demand as a bytestring, with the scenario as a byte string concatenated on it
-			out += "ScenarioEnd";
-			temp += scenarioIter +")" + out;
+			out += ")";
+			// out is now "Scenario(...)
+			OutputStream oStream = null;
+			GZIPOutputStream gzip = new GZIPOutputStream(oStream);
+			gzip.write(out.getBytes());
+			gzip.close();
+			out = oStream.toString();
+			oStream.close();
 		}
 		catch(Exception e){
 			System.out.println(e);
@@ -600,24 +603,38 @@ public class Main {
 	}
 
 	private static void loadGame(){
-		//load in byte by byte in string, unless
-		
-		//Game name should be kept track of to auto-fill the save game bar, and will be grabbed when it's selected to load from whatever list it is that we want.
-		// we can also decide how we want to organize it's folders
-		
-		//Should return a Scenario
 		ResultSet rs;
-        try{
-            String scenarioString = "Select * from Scenario where CycleNum = (Select MAX(CycleNum) from Scenario)";
-        Statement stmt2 = conn.createStatement();
-        rs = stmt2.executeQuery(scenarioString);
-        rs.next();
-        System.out.println(rs.getString(1));
-        }catch(Exception e){
-            System.out.println(e);
-        }
-        //return latestScenario
-	}
+		// Need a file buffer/stream
+		try {
+			//			FileReader fIn  = new FileReader(saveName+".gme");
+			//			in = fIn.toString();
+			GZIPInputStream gzipIn = new GZIPInputStream(new FileInputStream(saveName+".gme"));
+			byte[] ba = new byte[1];
+			String in ="";
+			while(gzipIn.available() == 1){
+				gzipIn.read(ba);
+				in += new String(ba,"UTF-8");
+			}
+			gzipIn.close();
+			System.out.println(in);
+			//in should have the uncompressed string info, now just have to read it into the tables.
+
+			//Game name should be kept track of to auto-fill the save game bar, and will be grabbed when it's selected to load from whatever list it is that we want.
+			// we can also decide how we want to organize it's folders
+
+			//Should return a Scenario
+				String scenarioString = "Select * from Scenario where CycleNum = (Select MAX(CycleNum) from Scenario)";
+				Statement stmt2 = conn.createStatement();
+				rs = stmt2.executeQuery(scenarioString);
+				rs.next();
+				System.out.println(rs.getString(1));
+			}
+			catch(Exception e){
+				System.out.println(e);
+			}
+
+			//return latestScenario
+		}
 
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub

@@ -420,16 +420,14 @@ public class Main {
 		}
 	}
 
-	public static void saveGame(){// Obfuscate the file by subtracting 1 from each byte. Reverse by adding when we read in
+	public static void saveGame(){
 		ResultSet rs;
 		// Need a file buffer/stream
 		String out = "Demand(";
 		try{
-			int demandIter = 0;
 			Statement stmt2 = conn.createStatement();
 			rs = stmt2.executeQuery("select * from Demand");
 			while (rs.next()) {//need to keep track of how many rs.next() we get
-				demandIter ++;
 				for(int x = 1;x<=4;x++){
 					String in = rs.getString(x);
 					out+= in;
@@ -443,7 +441,7 @@ public class Main {
 			
 			//out now has the demand as a binary string
 			Statement stmt1 = conn.createStatement();
-			out += "ScenarioCount(";
+			out += "Scenario(";
 			rs = stmt1.executeQuery("select * from Scenario");
 			while (rs.next()) {
 				for(int x = 1;x<=26;x++){
@@ -465,25 +463,14 @@ public class Main {
 		catch(Exception e){
 			System.out.println(e);
 		}
-		try {
-			FileWriter fOut = new FileWriter(saveName+".gme");//We'll have to change game name if they change it in their prompt.
-			//We COULD make it so that we dictate the save names, but people tend to not like that.
-			fOut.append(out);
-			fOut.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	
 	public static void saveScenario(){// Obfuscate the file by subtracting 1 from each byte. Reverse by adding when we read in
 		ResultSet rs;
 		// Need a file buffer/stream
-		String temp = "ScenariosCount(";
-		String out = "I like turtles:";
+		String out = "Scenario(";
 		try{
-			int scenarioIter = 0;//keep  track of how many bytes of scenario we're going to read
 			Statement stmt1 = conn.createStatement();
 			rs = stmt1.executeQuery("select * from Scenario");
 			while (rs.next()) {
@@ -494,28 +481,16 @@ public class Main {
 						out+= ",";
 				}
 				out+= "endRow";
-
 			}
 			out += ")";
-			// out is now "Scenario(...)
-			OutputStream oStream = null;
-			GZIPOutputStream gzip = new GZIPOutputStream(oStream);
-			gzip.write(out.getBytes());
-			gzip.close();
-			out = oStream.toString();
-			oStream.close();
+			GZIPOutputStream gzipIn = new GZIPOutputStream(new FileOutputStream(saveName+".gme"));
+			gzipIn.write(out.getBytes());
+			gzipIn.close();
+			// now equals the compressed string, basically gibberish
+			//Note, our files may be so small that compression increases the size, which is fine, the compression is mostly to obfuscate the string
 		}
 		catch(Exception e){
 			System.out.println(e);
-		}
-		try {
-			FileWriter fOut = new FileWriter(saveName+".scn");//We'll have to change game name if they change it in their prompt.
-			//We COULD make it so that we dictate the save names, but people tend to not like that.
-			fOut.append(temp);
-			fOut.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	

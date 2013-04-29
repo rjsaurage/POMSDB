@@ -1,4 +1,4 @@
-Fri Apr 26 15:10:08 CDT 2013 Thread[main,5,main] Cleanup action starting
+Sun Apr 28 19:23:32 CDT 2013 Thread[main,5,main] Cleanup action starting
 java.sql.SQLException: Database 'POMSDB' not found.
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
 	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)

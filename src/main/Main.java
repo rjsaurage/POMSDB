@@ -400,6 +400,8 @@ public class Main {
 		return true;
 
 	}
+
+	
 	//Prints current contents of the Demand table for testing
 	public static void printDemand(){
 		ResultSet rs;
@@ -434,7 +436,7 @@ public class Main {
 					if(x<4)
 						out += ",";
 				}
-				out+= "endRow";
+				out+= "/";
 		
 			}
 			out += ")";// should be "Demand( #,#,#,#endRow#,#,#,#endRow....endRow)
@@ -450,7 +452,7 @@ public class Main {
 					if(x<26)
 						out+= ",";
 				}
-				out+= "endRow";
+				out+= "/";
 
 			}
 			// out is now "Demand(.....)Scenario(...)
@@ -593,10 +595,34 @@ public class Main {
 			gzipIn.close();
 			System.out.println(in);
 			//in should have the uncompressed string info, now just have to read it into the tables.
-
 			//Game name should be kept track of to auto-fill the save game bar, and will be grabbed when it's selected to load from whatever list it is that we want.
 			// we can also decide how we want to organize it's folders
-
+			
+			int i = 7;
+			while(in.charAt(i) != ')'){
+				i++;
+			}
+			String demand = in.substring(7, i);
+			//demand is basically a csv
+			int d = 0;
+			String currString = "" ;
+			
+			while(demand.charAt(d) != '/'){
+				PreparedStatement psInsert = conn
+						.prepareStatement("insert into Demand values (?,?,?,?)");
+				for(int p = 1; p<=4; p++){
+					while(demand.charAt(d) != ','){
+						currString+= demand.charAt(d);
+						d++;
+					}
+					psInsert.setString(p, "" + currString);
+					System.out.println(currString);
+				}
+				psInsert.executeUpdate();
+			}
+			
+			
+			
 			//Should return a Scenario
 				String scenarioString = "Select * from Scenario where CycleNum = (Select MAX(CycleNum) from Scenario)";
 				Statement stmt2 = conn.createStatement();
